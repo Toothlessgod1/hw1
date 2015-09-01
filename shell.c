@@ -72,15 +72,15 @@ void findPath(tok_t *ka){
 }
 void Command(tok_t *t,int ope,int i){
   printf("%s","shmuck");
-	    if(ope!=-1&&strcmp(t[i],">")==0){
+	    if(strcmp(t[i],">")==0){
 	      t[i]=NULL;
-	      if(dup2(ope,0)!=-1){
+	      if(dup2(ope,1)!=-1){
 		findPath(t);
 		close(ope);
 	      }
-	    }else if(ope!=-1&&strcmp(t[i],"<")==0){
+	    }else if(strcmp(t[i],"<")==0){
 	      t[i]=NULL;
-	      if(dup2(ope,1)!=-1){
+	      if(dup2(ope,0)!=-1){
 		findPath(t);  
 		close(ope);
 	      }
@@ -186,8 +186,12 @@ int shell (int argc, char *argv[]) {
 	int ope;
 	int i;
 	for(i=0;i<MAXTOKS&&t[i];i++){
-	  if(strcmp(t[i],"<")==0||strcmp(t[i],">")==0){
-	    ope=open(t[i+1],O_WRONLY | O_CREAT | O_APPEND/*,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH*/);
+	  if(strcmp(t[i],"<")==0){
+	    ope=open(t[i+1], O_RDONLY/*,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH*/);
+	    Command(t,ope,i);
+	    i=MAXTOKS&&t[i];
+	  }else if(strcmp(t[i],">")==0){
+	    ope=open(t[i+1], O_CREAT|O_WRONLY| O_APPEND/*,S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH*/);
 	    Command(t,ope,i);
 	    i=MAXTOKS&&t[i];
 	  }
